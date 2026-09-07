@@ -2,7 +2,7 @@ import cadastro from '../assets/icons/cadastro.png'
 import login from '../assets/icons/login.png'
 import home from '../assets/icons/home.png'
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { NavLink } from 'react-router'
 
 const burguer = 'flex flex-col fixed top-[2%] right-4 p-[8px_5px] gap-1 border-4 rounded-full transition-all duration-350 ease-in md:hidden pointer-events-auto z-100'
 
@@ -33,8 +33,10 @@ export default function Header() {
 }
 
 function Item({ img, texto }) {
+    const toPath = `${texto === 'home' ? '/' : `/${texto.toLowerCase()}`}`
+
     return (
-        <li className='text-branco filtro-imagem text-[1.4rem] cursor-pointer'><Link to={texto} className='flex justify-center text-center gap-2'><img src={img} alt={texto} className='w-8 z-0' /><p className='group-hover:flex capitalize pointer-events-auto md:hidden md:group-hover:flex'>{texto}</p></Link></li>
+        <li className='text-branco text-[1.4rem] cursor-pointer px-2'><NavLink to={toPath} className={({ isActive }) => `flex justify-center text-center w-full h-full pb-3 pt-2 gap-2 rounded-full overflow-hidden ${isActive ? 'bg-laranja-500' : ''}`}><img src={img} alt={texto} className='filtro-imagem w-8 z-0' /><p className='group-hover:flex capitalize pointer-events-auto md:hidden md:group-hover:flex'>{texto}</p></NavLink></li>
     )
 }
 
