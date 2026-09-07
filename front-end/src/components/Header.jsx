@@ -2,10 +2,11 @@ import cadastro from '../assets/icons/cadastro.png'
 import login from '../assets/icons/login.png'
 import home from '../assets/icons/home.png'
 import { useState } from 'react'
+import { Link } from 'react-router'
 
 const burguer = 'flex flex-col fixed top-[2%] right-4 p-[8px_5px] gap-1 border-4 rounded-full transition-all duration-350 ease-in md:hidden pointer-events-auto z-100'
 
-const menu = 'flex flex-col justify-evenly pointer-events-auto bg-vermelho-500 w-38 h-full -translate-x-42 duration-800 transform ease-in overflow-hidden md:translate-0 md:w-17.5 md:[&>li>p]:hidden md:duration-400 md:hover:w-40 md:hover:[&>li>p]:flex'
+const menu = 'flex flex-col justify-evenly pointer-events-auto bg-vermelho-500 w-38 h-full -translate-x-42 duration-800 transform ease-in overflow-hidden md:translate-0 md:w-17.5  md:duration-400 md:hover:w-40'
 
 export default function Header() {
     let [isMenu, setMenu] = useState(false)
@@ -33,7 +34,7 @@ export default function Header() {
 
 function Item({ img, texto }) {
     return (
-        <li className='flex justify-center text-center text-branco filtro-imagem text-[1.4rem] gap-2 cursor-pointer'><img src={img} alt={texto} className='w-8 z-0' /><p className='group-hover:flex capitalize pointer-events-auto'>{texto}</p></li>
+        <li className='text-branco filtro-imagem text-[1.4rem] cursor-pointer'><Link to={texto} className='flex justify-center text-center gap-2'><img src={img} alt={texto} className='w-8 z-0' /><p className='group-hover:flex capitalize pointer-events-auto md:hidden md:group-hover:flex'>{texto}</p></Link></li>
     )
 }
 

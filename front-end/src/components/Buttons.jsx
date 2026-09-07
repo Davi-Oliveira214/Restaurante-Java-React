@@ -2,12 +2,12 @@ const button = 'font-bold text-[1rem] p-1 text-preto border-2 border-preto round
 
 export function Agendar() {
     return (
-        <button type='button' className={`${button} bg-green-800 [--cor-btn:bg-green-600]`}>Agendar</button>
+        <button type='button' className={`${button} bg-green-800 [--cor-btn:#00a63e]`}>Agendar</button>
     )
 }
 
 export function Detalhes() {
     return (
-        <button type='button' className={`${button} bg-laranja-500 [--cor-btn:bg-laranja-400]`}>Detalhes</button>
+        <button type='button' className={`${button} bg-laranja-500 [--cor-btn:#faa307]`}>Detalhes</button>
     )
 }
