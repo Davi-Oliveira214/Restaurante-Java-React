@@ -1,41 +1,47 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
-    --color-laranja-400: #faa307;
-    --color-laranja-500: #f48c06;
+  --color-laranja-400: #faa307;
+  --color-laranja-500: #f48c06;
 
-    --color-vermelho-300: #d00000;
-    --color-vermelho-400: #9d0208;
-    --color-vermelho-500: #6a040f;
-    --color-vermelho-600: #38040e;
+  --color-vermelho-300: #d00000;
+  --color-vermelho-400: #9d0208;
+  --color-vermelho-500: #6a040f;
+  --color-vermelho-600: #38040e;
 
-    --color-branco: #ffff;
-    --color-preto: #03071e;
-    --color-cinza: #ced4da;
+  --color-branco: #ffff;
+  --color-preto-azulado: #03071e;
+  --color-preto: #000000;
+  --color-cinza: #ced4da;
 
-    @keyframes setas {
-        0% {
-            transform: translateX(var(--seta));
-            opacity: 0;
-        }
-
-        100% {
-            transform: translateX(0);
-            opacity: 1;
-        }
+  @keyframes setas {
+    0% {
+      transform: translateX(var(--seta));
+      opacity: 0;
     }
 
-    --animate-setas: setas 0.7s ease-out forwards;
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  --animate-setas: setas 0.7s ease-out forwards;
 }
 
 @utility filtro-imagem {
-    filter: brightness(0) saturate(100%) invert(100%) sepia(8%) saturate(2219%) hue-rotate(356deg) brightness(115%) contrast(107%);
+  filter: brightness(0) saturate(100%) invert(100%) sepia(8%) saturate(2219%)
+    hue-rotate(356deg) brightness(115%) contrast(107%);
 }
 
 body {
-    @apply w-screen h-screen;
+  @apply w-screen h-screen;
 }
 
 #root {
-    @apply w-full h-full flex bg-cinza overflow-y-scroll scrollbar-none;
+  @apply w-full h-full flex bg-cinza overflow-y-scroll scrollbar-none;
+}
+
+@utility botoes {
+  @apply bg-vermelho-600 text-branco rounded-lg text-center py-1 font-bold border-2 border-vermelho-400;
 }
