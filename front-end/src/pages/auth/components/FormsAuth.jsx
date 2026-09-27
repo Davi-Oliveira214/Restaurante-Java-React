@@ -16,13 +16,21 @@ const camposCadastro = [
 
 export function Login() {
    return (
-      <form className='w-full flex flex-col py-2 gap-3'>
+      <form className='w-full flex flex-col gap-4'>
          {camposLogin.map((campo) => (
             <CampoInput key={campo.id} {...campo} />
          ))}
-         <div className='grid grid-rows-2 gap-2 mt-3.5'>
+
+         <a
+            href='#'
+            className='text-white/40 text-xs text-right -mt-1 hover:text-white/70 transition-colors'
+         >
+            Esqueceu a senha?
+         </a>
+
+         <div className='flex flex-col gap-3 mt-2'>
             <BotaoSubmit texto='Entrar' />
-            <p className='text-branco text-center'>ou</p>
+            <Separador />
             <LinkAuth texto='Criar uma conta' rota='cadastro' />
          </div>
       </form>
@@ -31,14 +39,14 @@ export function Login() {
 
 export function Cadastro() {
    return (
-      <form className='w-full flex flex-col py-2 gap-3'>
+      <form className='w-full flex flex-col gap-4'>
          {camposCadastro.map((campo) => (
             <CampoInput key={campo.id} {...campo} />
          ))}
-         <div className='grid grid-rows-2 gap-0.5 mt-3.5'>
+         <div className='flex flex-col gap-3 mt-2'>
             <BotaoSubmit texto='Criar conta' />
-            <p className='text-branco text-center text-sm'>ou</p>
-            <LinkAuth texto='Login' rota='login' />
+            <Separador />
+            <LinkAuth texto='Já tenho uma conta' rota='login' />
          </div>
       </form>
    )
@@ -47,10 +55,10 @@ export function Cadastro() {
 function CampoInput({ id, label, tipo }) {
    if (tipo === 'password') return <CampoSenha id={id} label={label} />
    return (
-      <div className='flex flex-col'>
+      <div className='flex flex-col gap-1.5'>
          <label
             htmlFor={id}
-            className='text-branco/90 text-lg font-medium ml-1.5'
+            className='text-white/60 text-xs font-medium uppercase tracking-wider ml-0.5'
          >
             {label}
          </label>
@@ -60,7 +68,7 @@ function CampoInput({ id, label, tipo }) {
             id={id}
             autoComplete='username'
             required
-            className='border-2 rounded-2xl px-3 py-1 outline-none text-branco'
+            className='bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/20 outline-none focus:border-vermelho-300/60 focus:bg-white/8 transition-all duration-200'
          />
       </div>
    )
@@ -71,28 +79,28 @@ function CampoSenha({ id, label }) {
    const Icone = visivel ? IconEyeCheck : IconEyeOff
 
    return (
-      <div className='flex flex-col'>
+      <div className='flex flex-col gap-1.5'>
          <label
             htmlFor={id}
-            className='text-branco/90 text-lg font-medium ml-1.5'
+            className='text-white/60 text-xs font-medium uppercase tracking-wider ml-0.5'
          >
             {label}
          </label>
-         <div className='border-2 rounded-2xl text-branco flex items-center overflow-hidden'>
+         <div className='bg-white/5 border border-white/10 rounded-xl flex items-center overflow-hidden focus-within:border-vermelho-300/60 focus-within:bg-white/8 transition-all duration-200'>
             <input
                type={visivel ? 'text' : 'password'}
                name={id}
                id={id}
                autoComplete='new-password'
                required
-               className='outline-none w-full px-3 py-1'
+               className='outline-none w-full bg-transparent px-4 py-2.5 text-white text-sm'
             />
             <button
                type='button'
                onClick={() => setVisivel((prev) => !prev)}
-               className='mr-2'
+               className='px-3 text-white/30 hover:text-white/70 transition-colors'
             >
-               <Icone width={30} />
+               <Icone size={18} />
             </button>
          </div>
       </div>
@@ -103,10 +111,20 @@ function BotaoSubmit({ texto }) {
    return (
       <button
          type='submit'
-         className='bg-vermelho-600 text-branco rounded-lg text-center py-1.5 font-bold'
+         className='w-full py-2.5 rounded-xl font-semibold text-sm text-white bg-linear-to-b from-vermelho-300 to-vermelho-400 hover:from-vermelho-300/90 hover:to-vermelho-400/90 active:scale-[0.98] transition-all duration-150'
       >
          {texto}
       </button>
+   )
+}
+
+function Separador() {
+   return (
+      <div className='flex items-center gap-3'>
+         <span className='flex-1 h-px bg-white/10' />
+         <span className='text-white/25 text-xs'>ou</span>
+         <span className='flex-1 h-px bg-white/10' />
+      </div>
    )
 }
 
@@ -114,7 +132,10 @@ function LinkAuth({ texto, rota }) {
    return (
       <NavLink
          to={`../${rota}`}
-         className='text-branco rounded-lg text-center py-1.5 font-bold border-2 border-vermelho-400'
+         className='w-full py-2.5 rounded-xl font-medium text-sm text-white/60
+                     border border-white/10 text-center
+                     hover:border-white/20 hover:text-white/90
+                     transition-all duration-150'
       >
          {texto}
       </NavLink>
