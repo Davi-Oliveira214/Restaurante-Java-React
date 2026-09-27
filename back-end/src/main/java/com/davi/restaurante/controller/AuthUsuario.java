@@ -2,6 +2,7 @@ package com.davi.restaurante.controller;
 
 import com.davi.restaurante.records.request.CadastroRecord;
 import com.davi.restaurante.records.request.LoginRecord;
+import com.davi.restaurante.records.request.UpdateUser;
 import com.davi.restaurante.records.response.AuthRecord;
 import com.davi.restaurante.records.response.UsuarioResponseRecord;
 import com.davi.restaurante.services.UsuarioService;
@@ -10,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,13 +31,21 @@ public class AuthUsuario {
         return ResponseEntity.status(HttpStatus.OK).body(this.service.login(record));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<UsuarioResponseRecord> atualizar(@PathVariable Long id, @RequestBody UpdateUser userUpdate) {
+        return ResponseEntity.status(HttpStatus.OK).body(this.service.updateUser(id, userUpdate));
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseRecord> usuario(@PathVariable Long id) {
+    public ResponseEntity<UsuarioResponseRecord> usuario(@PathVariable @Valid Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(this.service.usuario(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UsuarioResponseRecord> deletarUsuario(@PathVariable Long id){
-        return ResponseEntity.status(200).body(this.service.deletar(id));
+    public ResponseEntity<?> deletarUsuario(@PathVariable Long id) {
+        this.service.deletar(id);
+        Map<String, Object> resposta = new HashMap<>();
+        resposta.put("message", "usuário deletado com sucesso");
+        return ResponseEntity.status(200).body(resposta);
     }
 }

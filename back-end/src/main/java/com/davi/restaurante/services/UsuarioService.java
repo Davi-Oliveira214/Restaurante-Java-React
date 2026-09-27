@@ -4,6 +4,7 @@ import com.davi.restaurante.entity.UsuarioEntity;
 import com.davi.restaurante.exceptions.UsuarioException;
 import com.davi.restaurante.records.request.CadastroRecord;
 import com.davi.restaurante.records.request.LoginRecord;
+import com.davi.restaurante.records.request.UpdateUser;
 import com.davi.restaurante.records.response.AuthRecord;
 import com.davi.restaurante.records.response.UsuarioResponseRecord;
 import com.davi.restaurante.repository.UsuarioRepository;
@@ -17,9 +18,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.HexFormat;
 
 @Service
@@ -90,10 +89,31 @@ public class UsuarioService {
         return new UsuarioResponseRecord(user);
     }
 
-    public UsuarioResponseRecord deletar(Long id) {
+    public void deletar(Long id) {
         UsuarioEntity user = this.repository.findById(id).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
 
         this.repository.delete(user);
+    }
+
+    public UsuarioResponseRecord updateUser(Long id, UpdateUser userUpdate) {
+        UsuarioEntity user = this.repository.findById(id).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
+
+        if (userUpdate.nome() != null && !userUpdate.nome().isBlank())
+            user.setNome(userUpdate.nome());
+
+        if (userUpdate.email() != null && !userUpdate.email().isBlank()) {
+            if (this.repository.existsByEmail(userUpdate.email()))
+                throw new UsuarioException("Esse email já está cadastrado", HttpStatus.CONFLICT);
+
+            user.setEmail(userUpdate.email());
+        }
+
+        if (userUpdate.senha() != null && !userUpdate.senha().isBlank()) {
+            verificarCaracterSenha(userUpdate.senha(), userUpdate.repita_senha());
+
+            user.setSenha(hashPassWord(userUpdate.senha()));
+        }
+
         return new UsuarioResponseRecord(user);
     }
 
@@ -122,9 +142,8 @@ public class UsuarioService {
             if (!Character.isWhitespace(c)) simbolos = true;
         }
 
-        if (!minuscula || !maiuscula || !numeros || !simbolos) {
+        if (!minuscula || !maiuscula || !numeros || !simbolos)
             throw new UsuarioException("A senha precisa ter letras maiúsculas, minúsculas e símbolos", HttpStatus.CONFLICT);
-        }
 
         if (!senha.equals(rpt_senha))
             throw new UsuarioException("Repita a mesma senha", HttpStatus.CONFLICT);
