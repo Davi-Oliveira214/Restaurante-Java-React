@@ -1,19 +1,22 @@
-import cadastro from '../assets/icons/cadastro.png'
-import login from '../assets/icons/login.png'
-import home from '../assets/icons/home.png'
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router'
+import {
+   IconLogin2,
+   IconUserPlus,
+   IconUserCheck,
+   IconHome,
+} from '@tabler/icons-react'
 
 const classeBurguer =
-   'flex flex-col fixed top-[2%] right-4 p-[8px_5px] gap-1 border-4 rounded-full transition-all duration-350 ease-in md:hidden pointer-events-auto z-100'
+   'flex flex-col fixed top-4 right-4 p-2 gap-[5px] rounded-xl transition-all duration-300 ease-in md:hidden pointer-events-auto z-100 bg-vermelho-600/80 backdrop-blur-sm border border-vermelho-500/50'
 
 const classeMenu =
-   'flex flex-col justify-evenly pointer-events-auto bg-vermelho-600 w-38 h-full -translate-x-42 duration-800 transform ease-in overflow-hidden md:translate-0 md:w-17.5 md:duration-400 md:hover:w-40'
+   'group relative flex flex-col justify-evenly pointer-events-auto bg-vermelho-600 w-38 h-full -translate-x-42 duration-600 transform ease-in-out overflow-hidden md:translate-x-0 md:w-17.5 md:duration-500 md:hover:w-40'
 
 const itensMenu = [
-   { img: home, texto: 'home', rota: '/' },
-   { img: login, texto: 'login', rota: '/auth/login' },
-   { img: cadastro, texto: 'cadastro', rota: '/auth/cadastro' },
+   { Icone: IconHome, texto: 'home', rota: '/' },
+   { Icone: IconUserCheck, texto: 'login', rota: '/auth/login' },
+   { Icone: IconUserPlus, texto: 'cadastro', rota: '/auth/cadastro' },
 ]
 
 export default function Header() {
@@ -40,38 +43,33 @@ export default function Header() {
       <header
          className={`z-80 h-screen fixed md:static md:w-17.5 ${
             menuAberto
-               ? 'w-screen bg-[rgba(0,0,0,0.4)] pointer-events-auto'
+               ? 'w-screen bg-black/50 pointer-events-auto'
                : 'pointer-events-none'
          }`}
          onClick={alternarMenu}
       >
-         <div
-            className={`${classeBurguer} ${
-               menuAberto
-                  ? 'border-laranja-500 [&>div]:border-laranja-400'
-                  : 'border-vermelho-500'
-            }`}
-         >
-            <LinhaBurguer />
-            <LinhaBurguer />
-            <LinhaBurguer />
+         <div className={classeBurguer}>
+            <LinhaBurguer aberto={menuAberto} index={0} />
+            <LinhaBurguer aberto={menuAberto} index={1} />
+            <LinhaBurguer aberto={menuAberto} index={2} />
          </div>
 
          <ul
-            className={`group relative ${classeMenu} ${menuAberto ? 'translate-x-0' : ''}`}
+            className={`${classeMenu} ${menuAberto ? 'translate-x-0' : ''}`}
             onClick={(e) => e.stopPropagation()}
          >
-            {itensMenu.map(({ img, texto, rota }) => (
+            {itensMenu.map(({ Icone, texto, rota }) => (
                <ItemMenu
                   key={texto}
-                  img={img}
+                  Icone={Icone}
                   texto={texto}
                   rota={rota}
                   ref={(el) => (refs.current[texto] = el)}
                />
             ))}
             <li
-               className='absolute bg-laranja-500 w-full h-14 transform duration-300 rounded-full'
+               className='absolute w-full h-14 transform duration-500 rounded-lg
+                           bg-white/20 border-l-4 border-laranja-500 pointer-events-none'
                ref={(el) => (refs.current.barra = el)}
             />
          </ul>
@@ -79,18 +77,15 @@ export default function Header() {
    )
 }
 
-function ItemMenu({ img, texto, rota, ref }) {
+function ItemMenu({ Icone, texto, rota, ref }) {
    return (
-      <li
-         className='text-branco text-[1.4rem] cursor-pointer px-2 z-10'
-         ref={ref}
-      >
+      <li className='text-branco cursor-pointer px-2 z-10' ref={ref}>
          <NavLink
             to={rota}
-            className='flex justify-center text-center w-full h-full pb-3 pt-2 gap-2 rounded-full overflow-hidden'
+            className='flex items-center justify-center w-full h-full py-3 gap-2.5 rounded-lg'
          >
-            <img src={img} alt={texto} className='filtro-imagem w-8 z-0' />
-            <span className='group-hover:flex capitalize pointer-events-auto md:hidden md:group-hover:flex'>
+            <Icone size={28} />
+            <span className='capitalize text-sm text-branco font-medium duration-200 md:hidden md:group-hover:block '>
                {texto}
             </span>
          </NavLink>
@@ -98,8 +93,14 @@ function ItemMenu({ img, texto, rota, ref }) {
    )
 }
 
-function LinhaBurguer() {
+function LinhaBurguer({ aberto, index }) {
    return (
-      <div className='w-7.5 h-1 bg-vermelho-400 rounded-sm transition-all duration-350 ease-in' />
+      <div
+         className={`w-6 h-0.5 bg-branco rounded-full transition-all duration-500 ease-in-out
+            ${aberto && index === 0 ? 'translate-y-1.75 rotate-45' : ''}
+            ${aberto && index === 1 ? 'opacity-0 scale-x-0' : ''}
+            ${aberto && index === 2 ? '-translate-y-1.75 -rotate-45' : ''}
+         `}
+      />
    )
 }
