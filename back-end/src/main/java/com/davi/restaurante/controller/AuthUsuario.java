@@ -31,4 +31,9 @@ public class AuthUsuario {
     public ResponseEntity<UsuarioResponseRecord> usuario(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(this.service.usuario(id));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<UsuarioResponseRecord> deletarUsuario(@PathVariable Long id){
+        return ResponseEntity.status(200).body(this.service.deletar(id));
+    }
 }

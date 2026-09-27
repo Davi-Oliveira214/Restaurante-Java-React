@@ -39,6 +39,8 @@ public class UsuarioService {
         if (this.repository.existsByEmail(record.email()))
             throw new UsuarioException("Esse email já está cadastrado", HttpStatus.CONFLICT);
 
+        verificarCaracterSenha(record.senha(), record.repita_senha());
+
         BeanUtils.copyProperties(record, user);
 
         user.setSenha(this.hashPassWord(record.senha()));
@@ -88,6 +90,13 @@ public class UsuarioService {
         return new UsuarioResponseRecord(user);
     }
 
+    public UsuarioResponseRecord deletar(Long id) {
+        UsuarioEntity user = this.repository.findById(id).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
+
+        this.repository.delete(user);
+        return new UsuarioResponseRecord(user);
+    }
+
     private String hashPassWord(String senha) {
         MessageDigest passHash;
 
@@ -98,6 +107,27 @@ public class UsuarioService {
         }
 
         return HexFormat.of().formatHex(passHash.digest(senha.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private void verificarCaracterSenha(String senha, String rpt_senha) {
+        boolean maiuscula = false, minuscula = false, numeros = false, simbolos = false;
+
+        if (senha.length() < 5)
+            throw new UsuarioException("A senha precisa ter no minímo 5 caracteres", HttpStatus.CONFLICT);
+
+        for (Character c : senha.toCharArray()) {
+            if (Character.isLowerCase(c)) minuscula = true;
+            if (Character.isUpperCase(c)) maiuscula = true;
+            if (Character.isDigit(c)) numeros = true;
+            if (!Character.isWhitespace(c)) simbolos = true;
+        }
+
+        if (!minuscula || !maiuscula || !numeros || !simbolos) {
+            throw new UsuarioException("A senha precisa ter letras maiúsculas, minúsculas e símbolos", HttpStatus.CONFLICT);
+        }
+
+        if (!senha.equals(rpt_senha))
+            throw new UsuarioException("Repita a mesma senha", HttpStatus.CONFLICT);
     }
 
     private void setBloqueio(UsuarioEntity user, int tentativas, Instant bloqueio) {
