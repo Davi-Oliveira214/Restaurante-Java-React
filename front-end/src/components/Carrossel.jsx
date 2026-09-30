@@ -3,34 +3,62 @@ import { getPratos } from '../services/API'
 import { useEffect, useState } from 'react'
 
 export default function Carrossel() {
-    const [resp, setResp] = useState([])
+   const [resp, setResp] = useState([])
 
-    useEffect(() => {
-        const request = async () => {
-            const res = await getPratos()
-            setResp(res)
-        }
+   // useEffect(() => {
+   //     const request = async () => {
+   //         const res = await getPratos()
+   //         setResp(res)
+   //     }
+   //     request()
+   // }, [])
 
-        request()
-    }, [])
+   return (
+      <section
+         aria-label='Carrossel de pratos'
+         className='group relative w-full flex items-center overflow-x-clip'
+      >
+         <ButtonSeta dir='left' />
 
-    return (
-        <div className='group w-full flex overflow-x-clip relative'>
-            <ButtonSeta dir={'left'} />
-            <div className='overflow-scroll w-full h-full flex items-center gap-3.5 py-3.5 px-2.5 scrollbar-none'>
-                {resp.map((data) => (
-                    <Card key={data.id} nome={data.nome} descricao={data.descricao} preco={data.preco} />
-                ))}
-            </div>
-            <ButtonSeta dir={'right'} />
-        </div>
-    )
+         <ul
+            role='list'
+            className='flex w-full h-full items-center gap-3.5 py-4 px-3 overflow-x-scroll scrollbar-none list-none'
+         >
+            {/* {resp.map((prato) => (
+                    <li key={prato.id}>
+                        <Card nome={prato.nome} descricao={prato.descricao} preco={prato.preco} data={prato.data} />
+                    </li>
+                ))} */}
+
+            <li>
+               <Card
+                  data=''
+                  descricao='A melhor feijoada'
+                  nome='Feijoada'
+                  preco={50}
+               />
+            </li>
+         </ul>
+
+         <ButtonSeta dir='right' />
+      </section>
+   )
 }
 
 function ButtonSeta({ dir }) {
-    const style = 'z-70 opacity-0 absolute top-[50%] text-2xl text-vermelho-600 bg-vermelho-400 border-2 border-preto cursor-pointer rounded-full p-[0_8px_4px_10px] sm:group-hover:animate-setas'
+   const isLeft = dir === 'left'
+   const position = isLeft ? 'left-2 [--seta:-43px]' : 'right-2 [--seta:43px]'
 
-    return (
-        <button type='button' className={`${style} ${dir == 'left' ? 'left-3.75 [--seta:-43px]' : 'right-3.75 [--seta:43px]'}`}>{dir == 'left' ? '<' : '>'}</button>
-    )
+   const style =
+      'z-50 absolute top-1/2 -translate-y-1/2 px-4 pb-3 pt-1 rounded-full flex items-center justify-center opacity-0 sm:group-hover:opacity-100 bg-vermelho-400 border-2 border-vermelho-600 text-branco text-2xl leading-none cursor-pointer transition-all duration-200 hover:bg-vermelho-600 focus-visible:outline-2 focus-visible:outline-branco sm:group-hover:animate-setas'
+
+   return (
+      <button
+         type='button'
+         aria-label={isLeft ? 'Prato anterior' : 'Próximo prato'}
+         className={`${style} ${position}`}
+      >
+         {isLeft ? '‹' : '›'}
+      </button>
+   )
 }
