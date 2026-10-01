@@ -36,12 +36,8 @@
       hue-rotate(356deg) brightness(115%) contrast(107%);
 }
 
-body {
-   @apply w-screen h-screen;
-}
-
 #root {
-   @apply w-full h-full flex bg-cinza overflow-y-scroll scrollbar-none;
+   @apply w-full min-h-full flex bg-cinza overflow-y-scroll scrollbar-none;
 }
 
 @utility botoes {

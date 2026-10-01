@@ -5,9 +5,9 @@ export default function Auth() {
    let rota = useLocation()
 
    return (
-      <main className='flex flex-1 w-full h-full justify-center items-center lg:justify-end z-10'>
+      <main className='flex flex-1 w-full h-screen justify-center items-center lg:justify-end z-10'>
          <div
-            className='z-10 flex flex-col w-full mx-3.5 rounded-2xl py-8 px-7 max-w-105 lg:mr-24
+            className='z-10 flex-1 flex flex-col w-full mx-3.5 rounded-2xl py-8 px-7 max-w-105 lg:mr-24
                          bg-preto-azulado/20 backdrop-blur-xl
                          border border-white/30'
          >

@@ -11,7 +11,7 @@ const classeBurguer =
    'flex flex-col fixed top-4 right-4 p-2 gap-[5px] rounded-xl transition-all duration-300 ease-in md:hidden pointer-events-auto z-100 bg-vermelho-600/80 backdrop-blur-sm border border-vermelho-500/50'
 
 const classeMenu =
-   'group relative flex flex-col justify-evenly pointer-events-auto bg-vermelho-600 w-38 h-full -translate-x-42 duration-600 transform ease-in-out overflow-hidden md:translate-x-0 md:w-17.5 md:duration-500 md:hover:w-40'
+   'group fixed flex flex-col justify-evenly pointer-events-auto bg-vermelho-600 w-38 h-full -translate-x-42 duration-600 transform ease-in-out overflow-hidden md:translate-x-0 md:w-17.5 md:duration-500 md:hover:w-40'
 
 const itensMenu = [
    { Icone: IconHome, texto: 'home', rota: '/' },
@@ -41,9 +41,9 @@ export default function Header() {
 
    return (
       <header
-         className={`z-80 h-screen fixed md:static md:w-17.5 ${
+         className={`z-80 h-screen md:static md:min-w-17.5 ${
             menuAberto
-               ? 'w-screen bg-black/50 pointer-events-auto'
+               ? 'w-screen bg-black/50 pointer-events-auto absolute'
                : 'pointer-events-none'
          }`}
          onClick={alternarMenu}
