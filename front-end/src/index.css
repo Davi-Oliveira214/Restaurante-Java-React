@@ -28,7 +28,15 @@
       }
    }
 
+   @keyframes carrossel {
+      100% {
+         translate: calc(-50% + 185px);
+      }
+   }
+
    --animate-setas: setas 0.7s ease-out forwards;
+
+   --animate-carrossel: carrossel 20s linear infinite;
 }
 
 @utility filtro-imagem {
@@ -37,7 +45,7 @@
 }
 
 #root {
-   @apply w-full min-h-full flex bg-cinza overflow-y-scroll scrollbar-none;
+   @apply max-w-screen min-h-full flex bg-cinza overflow-y-scroll scrollbar-none;
 }
 
 @utility botoes {

@@ -3,9 +3,9 @@ import { apresentar } from '../data/apresentacao.js'
 
 export function HomePage() {
    return (
-      <div className='flex flex-1 max-w-full flex-col'>
+      <div className='flex flex-1 overflow-hidden flex-col'>
          <Hero />
-         <main className='flex flex-col w-full'>
+         <main className='flex flex-col '>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-px bg-vermelho-400'>
                {apresentar.map((item) => (
                   <CardApresentacao
