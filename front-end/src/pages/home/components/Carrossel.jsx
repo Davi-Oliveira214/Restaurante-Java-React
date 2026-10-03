@@ -1,5 +1,5 @@
 import Card from './Card.jsx'
-import { api } from '../../services/API.js'
+import { api } from '../../../services/API.js'
 import { useEffect, useState } from 'react'
 
 export default function Carrossel() {

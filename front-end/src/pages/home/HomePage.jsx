@@ -1,5 +1,5 @@
-import Hero from '../components/Hero.jsx'
-import { apresentar } from '../data/apresentacao.js'
+import Hero from './components/Hero.jsx'
+import { apresentar } from '../../data/apresentacao.js'
 
 export function HomePage() {
    return (

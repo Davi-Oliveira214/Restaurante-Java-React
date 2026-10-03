@@ -1,5 +1,5 @@
-import Carrossel from '../components/util/Carrossel.jsx'
-import Banner from '../components/util/Banner.jsx'
+import Carrossel from './Carrossel.jsx'
+import Banner from './Banner.jsx'
 
 export default function Hero() {
    return (

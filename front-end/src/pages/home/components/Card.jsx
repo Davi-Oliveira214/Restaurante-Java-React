@@ -1,4 +1,4 @@
-import imagem from '../../assets/imgs/banner.png'
+import imagem from '../../../assets/imgs/banner.png'
 import { Agendar, Detalhes } from './Buttons.jsx'
 
 export default function Card({ nome, descricao, preco, data }) {

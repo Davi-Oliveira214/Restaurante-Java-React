@@ -6,7 +6,7 @@ import {
    IconHome,
    IconLogout2,
 } from '@tabler/icons-react'
-import { AuthContext } from '../../context/AuthContext'
+import { AuthContext } from '../context/AuthContext'
 
 const classeBurguer =
    'flex flex-col fixed top-4 right-4 p-2 gap-[5px] rounded-xl transition-all duration-300 ease-in md:hidden pointer-events-auto z-100 bg-vermelho-600/80 backdrop-blur-sm border border-vermelho-500/50'
@@ -16,6 +16,7 @@ const classeMenu =
 
 const itensMenu = [
    { Icone: IconHome, texto: 'home', rota: '/', tipo: 'comum' },
+
    { Icone: IconUserCheck, texto: 'login', rota: '/auth/login', tipo: 'auth' },
    {
       Icone: IconUserPlus,
