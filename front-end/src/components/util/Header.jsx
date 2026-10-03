@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router'
 import {
-   IconLogin2,
    IconUserPlus,
    IconUserCheck,
    IconHome,
+   IconLogout2,
 } from '@tabler/icons-react'
+import { AuthContext } from '../../context/AuthContext'
 
 const classeBurguer =
    'flex flex-col fixed top-4 right-4 p-2 gap-[5px] rounded-xl transition-all duration-300 ease-in md:hidden pointer-events-auto z-100 bg-vermelho-600/80 backdrop-blur-sm border border-vermelho-500/50'
@@ -14,15 +15,21 @@ const classeMenu =
    'group fixed flex flex-col justify-evenly pointer-events-auto bg-vermelho-600 w-38 h-full -translate-x-42 duration-600 transform ease-in-out overflow-hidden md:translate-x-0 md:w-17.5 md:duration-500 md:hover:w-40'
 
 const itensMenu = [
-   { Icone: IconHome, texto: 'home', rota: '/' },
-   { Icone: IconUserCheck, texto: 'login', rota: '/auth/login' },
-   { Icone: IconUserPlus, texto: 'cadastro', rota: '/auth/cadastro' },
+   { Icone: IconHome, texto: 'home', rota: '/', tipo: 'comum' },
+   { Icone: IconUserCheck, texto: 'login', rota: '/auth/login', tipo: 'auth' },
+   {
+      Icone: IconUserPlus,
+      texto: 'cadastro',
+      rota: '/auth/cadastro',
+      tipo: 'auth',
+   },
 ]
 
 export default function Header() {
    const [menuAberto, setMenuAberto] = useState(false)
    const refs = useRef({})
    const rotaAtual = useLocation()
+   const { auth } = useContext(AuthContext)
 
    const alternarMenu = () => setMenuAberto((prev) => !prev)
 
@@ -58,15 +65,21 @@ export default function Header() {
             className={`${classeMenu} ${menuAberto ? 'translate-x-0' : ''}`}
             onClick={(e) => e.stopPropagation()}
          >
-            {itensMenu.map(({ Icone, texto, rota }) => (
-               <ItemMenu
-                  key={texto}
-                  Icone={Icone}
-                  texto={texto}
-                  rota={rota}
-                  ref={(el) => (refs.current[texto] = el)}
-               />
-            ))}
+            {itensMenu
+               .filter(
+                  ({ tipo }) => tipo === 'comum' || (!auth && tipo === 'auth'),
+               )
+               .map(({ Icone, rota, texto }) => (
+                  <ItemMenu
+                     key={texto}
+                     Icone={Icone}
+                     texto={texto}
+                     rota={rota}
+                     ref={(el) => (refs.current[texto] = el)}
+                  />
+               ))}
+
+            {auth && <Logout />}
             <li
                className='absolute w-full h-14 transform duration-500 rounded-lg
                            bg-white/20 border-l-4 border-laranja-500 pointer-events-none'
@@ -87,6 +100,29 @@ function ItemMenu({ Icone, texto, rota, ref }) {
             <Icone size={28} />
             <span className='capitalize text-sm text-branco font-medium duration-200 md:hidden md:group-hover:block '>
                {texto}
+            </span>
+         </NavLink>
+      </li>
+   )
+}
+
+function Logout() {
+   const { setAuth } = useContext(AuthContext)
+
+   const sair = () => {
+      localStorage.removeItem('@App:user')
+      setAuth(null)
+   }
+
+   return (
+      <li className='text-branco cursor-pointer px-2 z-10' onClick={sair}>
+         <NavLink
+            to={'/auth/login'}
+            className='flex items-center justify-center w-full h-full py-3 gap-2.5 rounded-lg'
+         >
+            <IconLogout2 size={28} />
+            <span className='capitalize text-sm text-branco font-medium duration-200 md:hidden md:group-hover:block '>
+               Sair
             </span>
          </NavLink>
       </li>

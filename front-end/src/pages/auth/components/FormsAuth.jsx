@@ -5,12 +5,17 @@ import {
    IconEyeOff,
 } from '@tabler/icons-react'
 import { useState } from 'react'
-import { NavLink } from 'react-router'
+import { NavLink, useNavigate } from 'react-router'
 import { api } from '../../../services/API'
+import { useContext } from 'react'
+import { AuthContext } from '../../../context/AuthContext'
 
 export function Login() {
    const [mensagem, setMensagem] = useState({ msg: '', tipo: '' })
    const [disabilitar, setDesabilitar] = useState(false)
+   const navegate = useNavigate()
+
+   const { setAuth } = useContext(AuthContext)
 
    const submitLogin = async (e) => {
       e.preventDefault()
@@ -31,6 +36,10 @@ export function Login() {
             msg: resp.message,
             tipo: 'error',
          }))
+      } else {
+         localStorage.setItem('@App:user', JSON.stringify(resp))
+         setAuth(resp)
+         navegate('/')
       }
 
       setDesabilitar(false)
@@ -42,12 +51,12 @@ export function Login() {
          <CampoInput id={'email'} label={'Email'} tipo={'email'} />
          <CampoSenha id={'senha'} label={'Senha'} />
 
-         <NavLink
+         {/* <NavLink
             to='/auth/recuperar-senha'
             className='text-white/40 text-xs text-right -mt-1 hover:text-white/70 transition-colors'
          >
             Esqueceu a senha?
-         </NavLink>
+         </NavLink> */}
 
          <div className='flex flex-col gap-3 mt-2'>
             <BotaoSubmit texto='Entrar' disable={disabilitar} />
