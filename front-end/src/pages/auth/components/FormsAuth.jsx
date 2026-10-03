@@ -1,13 +1,20 @@
-import { IconAlertCircle, IconEyeCheck, IconEyeOff } from '@tabler/icons-react'
+import {
+   IconAlertCircle,
+   IconCircleCheck,
+   IconEyeCheck,
+   IconEyeOff,
+} from '@tabler/icons-react'
 import { useState } from 'react'
 import { NavLink } from 'react-router'
 import { api } from '../../../services/API'
 
 export function Login() {
-   const [mensagem, setMensagem] = useState('')
+   const [mensagem, setMensagem] = useState({ msg: '', tipo: '' })
+   const [disabilitar, setDesabilitar] = useState(false)
 
    const submitLogin = async (e) => {
       e.preventDefault()
+      setDesabilitar(true)
 
       const formData = new FormData(e.currentTarget)
 
@@ -17,14 +24,21 @@ export function Login() {
             senha: formData.get('senha'),
          })
          .then((data) => data.data)
-         .catch((error) => {
-            setMensagem(error.response.data.message + ' minutos')
-         })
+         .catch((error) => error.response.data)
+
+      if (resp.status >= 400) {
+         setMensagem(() => ({
+            msg: resp.message,
+            tipo: 'error',
+         }))
+      }
+
+      setDesabilitar(false)
    }
 
    return (
       <form className='w-full flex flex-col gap-4' onSubmit={submitLogin}>
-         {mensagem && <MensagemAviso mensagem={mensagem} />}
+         {mensagem.msg && <MensagemAviso prop={mensagem} />}
          <CampoInput id={'email'} label={'Email'} tipo={'email'} />
          <CampoSenha id={'senha'} label={'Senha'} />
 
@@ -36,7 +50,7 @@ export function Login() {
          </NavLink>
 
          <div className='flex flex-col gap-3 mt-2'>
-            <BotaoSubmit texto='Entrar' />
+            <BotaoSubmit texto='Entrar' disable={disabilitar} />
             <Separador />
             <LinkAuth texto='Criar uma conta' rota='cadastro' />
          </div>
@@ -45,39 +59,62 @@ export function Login() {
 }
 
 export function Cadastro() {
-   const [mensagem, setMensagem] = useState('')
+   const [mensagem, setMensagem] = useState({ msg: '', tipo: '' })
+   const [disabilitar, setDesabilitar] = useState(false)
 
    const submitCadastro = async (e) => {
       e.preventDefault()
+      setDesabilitar(true)
 
       const formData = new FormData(e.currentTarget)
 
       if (formData.get('senha') !== formData.get('repita_senha')) {
-         setMensagem('As senhas não são iguais')
+         setMensagem(() => ({
+            msg: 'As senhas não são iguais',
+            tipo: 'error',
+         }))
+
+         setDesabilitar(false)
          return
       }
 
-      await api
-         .post('/auth/cadastro', {
-            nome: formData.get('nome'),
-            email: formData.get('email'),
-            senha: formData.get('senha'),
-            repita_senha: formData.get('repita_senha'),
-         })
-         .then(setMensagem('Usuário cadastrado com sucesso!'))
-         .catch((error) => setMensagem(error.response.data.message))
+      const data = {
+         nome: formData.get('nome'),
+         email: formData.get('email'),
+         senha: formData.get('senha'),
+         repita_senha: formData.get('repita_senha'),
+      }
+
+      const resp = await api
+         .post('/auth/cadastro', data)
+         .then((data) => data.data)
+         .catch((error) => error.response.data)
+
+      if (resp.status >= 400) {
+         setMensagem(() => ({
+            msg: resp.message,
+            tipo: 'error',
+         }))
+      } else {
+         setMensagem(() => ({
+            msg: 'Usuário cadastrado com sucesso!',
+            tipo: 'ok',
+         }))
+      }
+
+      setDesabilitar(false)
    }
 
    return (
       <form className='w-full flex flex-col gap-4' onSubmit={submitCadastro}>
-         {mensagem && <MensagemAviso mensagem={mensagem} />}
+         {mensagem.msg && <MensagemAviso prop={mensagem} />}
          <CampoInput id={'nome'} label={'Nome'} tipo={'text'} />
          <CampoInput id={'email'} label={'Email'} tipo={'email'} />
          <CampoSenha id={'senha'} label={'Senha'} />
          <CampoSenha id={'repita_senha'} label={'Repita a senha'} />
 
          <div className='flex flex-col gap-3 mt-2'>
-            <BotaoSubmit texto='Criar conta' />
+            <BotaoSubmit texto='Criar conta' disable={disabilitar} />
             <Separador />
             <LinkAuth texto='Já tenho uma conta' rota='login' />
          </div>
@@ -141,13 +178,14 @@ function CampoSenha({ id, label }) {
    )
 }
 
-function BotaoSubmit({ texto }) {
+function BotaoSubmit({ texto, disable }) {
    return (
       <button
          type='submit'
-         className='w-full py-2.5 rounded-xl font-semibold text-sm text-white bg-linear-to-b from-vermelho-300 to-vermelho-400 hover:from-vermelho-300/90 hover:to-vermelho-400/90 active:scale-[0.98] transition-all duration-150'
+         className={`w-full py-2.5 rounded-xl font-semibold text-sm text-white bg-linear-to-b from-vermelho-300 to-vermelho-400 hover:from-vermelho-300/90 hover:to-vermelho-400/90 active:scale-[0.98] transition-all duration-150 ${disable ? 'opacity-45' : ''}`}
+         disabled={disable}
       >
-         {texto}
+         {!disable ? texto : 'Carregando...'}
       </button>
    )
 }
@@ -176,16 +214,19 @@ function LinkAuth({ texto, rota }) {
    )
 }
 
-function MensagemAviso({ mensagem }) {
+function MensagemAviso({ prop }) {
+   const { msg, tipo } = prop
+   const Icone = tipo === 'ok' ? IconCircleCheck : IconAlertCircle
+
    return (
       <div
          role='alert'
          className='flex items-start gap-2.5 -mt-1 px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10'
       >
          <span className='text-vermelho-500/90 my-auto shrink-0'>
-            <IconAlertCircle size={34} />
+            <Icone size={34} />
          </span>
-         <p className='text-white/55 text-xs leading-relaxed'>{mensagem}</p>
+         <p className='text-white/55 text-xs leading-relaxed my-auto'>{msg}</p>
       </div>
    )
 }
