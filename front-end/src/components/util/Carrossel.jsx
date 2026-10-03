@@ -8,7 +8,8 @@ export default function Carrossel() {
    useEffect(() => {
       const request = async () => {
          const res = await api.get('/pratos')
-         setResp(res)
+         const data = await res.data
+         setResp(data)
       }
       request()
    }, [])
