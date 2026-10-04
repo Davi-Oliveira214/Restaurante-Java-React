@@ -1,6 +1,7 @@
 package com.davi.restaurante.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
@@ -15,6 +16,7 @@ public class MesaEntity {
     private Integer numero;
 
     @Column(name = "criado_em", nullable = false, updatable = false)
+    @CreationTimestamp
     private Instant criado;
 
     public MesaEntity() {

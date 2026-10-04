@@ -8,6 +8,7 @@ import com.davi.restaurante.exceptions.RestauranteException;
 import com.davi.restaurante.exceptions.UsuarioException;
 import com.davi.restaurante.records.request.AgendamentoRecord;
 import com.davi.restaurante.records.response.AgendamentoResponseRecord;
+import com.davi.restaurante.records.response.HorarioDisponivel;
 import com.davi.restaurante.repository.AgendamentoRepository;
 import com.davi.restaurante.repository.MesaRepository;
 import com.davi.restaurante.repository.UsuarioRepository;
@@ -19,21 +20,20 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class AgendamentoService {
-    @Autowired
-    private AgendamentoRepository repository;
+    private final AgendamentoRepository repository;
 
-    @Autowired
-    private MesaRepository mesaRepository;
+    private final MesaRepository mesaRepository;
 
-    @Autowired
-    private UsuarioRepository userRepository;
+    private final UsuarioRepository userRepository;
 
-    public AgendamentoService() {
+    public AgendamentoService(AgendamentoRepository repository, MesaRepository mesaRepository, UsuarioRepository userRepository) {
+        this.repository = repository;
+        this.mesaRepository = mesaRepository;
+        this.userRepository = userRepository;
     }
 
     public AgendamentoResponseRecord agendar(AgendamentoRecord record) {
@@ -109,10 +109,10 @@ public class AgendamentoService {
         return agendamentos.stream().map(AgendamentoResponseRecord::new).toList();
     }
 
-    public AgendamentoResponseRecord agendamentoId(Long userId, Long id) {
-        UsuarioEntity user = this.userRepository.findById(userId).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
+    public AgendamentoResponseRecord agendamentoId(Long user_id, Long agendamento_id) {
+        UsuarioEntity user = this.userRepository.findById(user_id).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
 
-        AgendamentoEntity agendamento = this.repository.findById(id).orElseThrow(() -> new AgendamentoException("Nenhum agendamento encontrado", HttpStatus.NOT_FOUND));
+        AgendamentoEntity agendamento = this.repository.findById(agendamento_id).orElseThrow(() -> new AgendamentoException("Nenhum agendamento encontrado", HttpStatus.NOT_FOUND));
 
         if (!Objects.equals(user.getId(), agendamento.getUsuario().getId()))
             throw new AgendamentoException("Você não tem autorização para mudar essa agendamneto", HttpStatus.UNAUTHORIZED);
@@ -120,7 +120,7 @@ public class AgendamentoService {
         return new AgendamentoResponseRecord(agendamento);
     }
 
-    public List<AgendamentoResponseRecord> agendamentoDoDia(Long userId, LocalDate data, Integer mesaId) {
+    public List<AgendamentoResponseRecord> agendamentoDoDia(Long userId, LocalDate data, Long mesaId) {
         this.userRepository.findById(userId).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
 
         LocalDateTime inicio = data.atStartOfDay();
@@ -134,6 +134,52 @@ public class AgendamentoService {
             throw new AgendamentoException("Nenhum agendamento na data " + data + " para a mesa: " + mesaId, HttpStatus.NOT_FOUND);
 
         return agendamentos.stream().map(AgendamentoResponseRecord::new).toList();
+    }
+
+    public List<HorarioDisponivel> horariosDisponiveis(LocalDate data, Long mesa, int duracao) {
+        LocalDateTime inicio = data.atStartOfDay().plusHours(8);
+        LocalDateTime fim = data.atStartOfDay().plusHours(22);
+
+        List<AgendamentoEntity> agenda = repository.findAgendamentoDia(inicio, fim, mesa);
+
+        List<HorarioDisponivel> horariosDisponiveis = new ArrayList<>();
+
+        LocalDateTime ultimo = beforeHours(agenda, duracao, horariosDisponiveis, inicio);
+
+        afterHours(fim, horariosDisponiveis, duracao, ultimo);
+
+        return horariosDisponiveis;
+    }
+
+    private LocalDateTime beforeHours(List<AgendamentoEntity> agenda, int duracao, List<HorarioDisponivel> list, LocalDateTime inicio) {
+        for (AgendamentoEntity a : agenda) {
+            LocalDateTime inicioAgenda = a.getData();
+            LocalDateTime fimAgenda = calcHoras(inicioAgenda, a.getDuracao());
+
+            while (!calcHoras(inicio, duracao).isAfter(inicioAgenda)) {
+                LocalDateTime novoFim = calcHoras(inicio, duracao);
+
+                list.add(new HorarioDisponivel(inicio, novoFim));
+
+                inicio = novoFim;
+            }
+
+            if (fimAgenda.isAfter(inicio)) {
+                inicio = fimAgenda;
+            }
+        }
+
+        return inicio;
+    }
+
+    private void afterHours(LocalDateTime fim, List<HorarioDisponivel> list, int duracao, LocalDateTime ultimo) {
+        while (!ultimo.plusMinutes(duracao).isAfter(fim)) {
+            LocalDateTime novoFim = calcHoras(ultimo, duracao);
+
+            list.add(new HorarioDisponivel(ultimo, novoFim));
+
+            ultimo = novoFim;
+        }
     }
 
     private LocalDateTime calcHoras(LocalDateTime data, int duracao) {

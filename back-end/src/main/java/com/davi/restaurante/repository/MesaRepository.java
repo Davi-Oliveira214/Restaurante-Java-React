@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface MesaRepository extends JpaRepository<MesaEntity, Long> {
 
-    @Query(name = "numero_mesa")
-    Optional<MesaEntity> findByNumero(Integer numero);
+    @Query(name = "mesa_id")
+    Optional<MesaEntity> findByNumero(Long numero);
 }
