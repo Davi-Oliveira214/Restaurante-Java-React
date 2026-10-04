@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
 
-public record MesaResponseRecord(Long id, @JsonProperty("numero_mesa") Integer numero,
+public record MesaResponseRecord(Long id, @JsonProperty("codigo_mesa") String codigo,
                                  @JsonProperty("criado_em") Instant criado) {
     public MesaResponseRecord(MesaEntity mesa) {
-        this(mesa.getId(), mesa.getNumero(), mesa.getCriado());
+        this(mesa.getId(), mesa.getCodigo(), mesa.getCriado());
     }
 }

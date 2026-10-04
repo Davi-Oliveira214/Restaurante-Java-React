@@ -1,14 +1,15 @@
 package com.davi.restaurante.repository;
 
 import com.davi.restaurante.entity.AgendamentoEntity;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 public interface AgendamentoRepository extends JpaRepository<AgendamentoEntity, Long> {
 
     @Query(nativeQuery = true, value =
@@ -44,4 +45,7 @@ public interface AgendamentoRepository extends JpaRepository<AgendamentoEntity, 
     List<AgendamentoEntity> findAgendamentoDia(@Param("inicio") LocalDateTime inicioDia, @Param("fim") LocalDateTime fimDia, @Param("mesa_id") Long mesa);
 
     List<AgendamentoEntity> findByUsuarioId(Long userId);
+
+    @Query(value = "SELECT EXISTS(SELECT a.mesa_id, m.id  FROM mesa AS m INNER JOIN agendamentos AS a ON m.id=:mesa_id)", nativeQuery = true)
+    boolean existsMesa(@Param("mesa_id") Long mesaId);
 }

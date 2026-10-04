@@ -1,7 +1,7 @@
 package com.davi.restaurante.records.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
-public record MesaRecord(@JsonProperty("mesa_id") @NotNull Long numero) {
+public record MesaRecord(@JsonProperty("codigo_mesa") @NotBlank String codigo) {
 }

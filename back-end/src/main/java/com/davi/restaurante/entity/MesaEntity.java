@@ -12,8 +12,8 @@ public class MesaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, name = "numero_mesa")
-    private Integer numero;
+    @Column(unique = true, name = "codigo_mesa", nullable = false)
+    private String codigo;
 
     @Column(name = "criado_em", nullable = false, updatable = false)
     @CreationTimestamp
@@ -30,12 +30,12 @@ public class MesaEntity {
         this.id = id;
     }
 
-    public Integer getNumero() {
-        return numero;
+    public String getCodigo() {
+        return codigo;
     }
 
-    public void setNumero(Integer numero) {
-        this.numero = numero;
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
     }
 
     @PrePersist

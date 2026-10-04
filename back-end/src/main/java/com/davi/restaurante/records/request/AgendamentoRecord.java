@@ -6,5 +6,5 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public record AgendamentoRecord(@NotNull Long userId, @NotNull LocalDateTime data, @NotNull int duracao,
-                                @JsonProperty("mesa") @NotNull MesaRecord mesa) {
+                                @JsonProperty("mesa") @NotNull Long mesa) {
 }

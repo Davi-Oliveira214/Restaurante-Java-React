@@ -13,7 +13,6 @@ import com.davi.restaurante.repository.AgendamentoRepository;
 import com.davi.restaurante.repository.MesaRepository;
 import com.davi.restaurante.repository.UsuarioRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +40,7 @@ public class AgendamentoService {
 
         UsuarioEntity user = this.userRepository.findById(record.userId()).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
 
-        MesaEntity mesa = this.mesaRepository.findByNumero(record.mesa().numero()).orElseThrow(() -> new RestauranteException("Mesa informada não encontrada", HttpStatus.NOT_FOUND));
+        MesaEntity mesa = this.mesaRepository.findById(record.mesa()).orElseThrow(() -> new RestauranteException("Mesa informada não encontrada", HttpStatus.NOT_FOUND));
 
         if (this.repository.existeConflitoNoAgendamento(record.data(), calcHoras(record.data(), record.duracao()), mesa.getId(), null))
             throw new AgendamentoException("O tempo de agendamento gera conflito com os demais agendamentos", HttpStatus.CONFLICT);
@@ -76,7 +75,7 @@ public class AgendamentoService {
         if (!Objects.equals(user.getId(), agendamento.getUsuario().getId()))
             throw new AgendamentoException("Você não tem autorização para mudar essa agendamneto", HttpStatus.UNAUTHORIZED);
 
-        MesaEntity mesa = this.mesaRepository.findByNumero(record.mesa().numero())
+        MesaEntity mesa = this.mesaRepository.findById(record.mesa())
                 .orElseThrow(() -> new AgendamentoException("Mesa informada não encontrada", HttpStatus.NOT_FOUND));
 
         if (this.repository.existeConflitoNoAgendamento(record.data(), calcHoras(record.data(), record.duracao()), mesa.getId(), agendamento.getId()))
@@ -126,7 +125,7 @@ public class AgendamentoService {
         LocalDateTime inicio = data.atStartOfDay();
         LocalDateTime fim = data.atTime(LocalTime.MAX);
 
-        MesaEntity mesa = this.mesaRepository.findByNumero(mesaId).orElseThrow(() -> new RestauranteException("Mesa informada não encontrada", HttpStatus.NOT_FOUND));
+        MesaEntity mesa = this.mesaRepository.findById(mesaId).orElseThrow(() -> new RestauranteException("Mesa informada não encontrada", HttpStatus.NOT_FOUND));
 
         List<AgendamentoEntity> agendamentos = this.repository.findAgendamentosDoDia(inicio, fim, mesa.getId(), userId);
 
