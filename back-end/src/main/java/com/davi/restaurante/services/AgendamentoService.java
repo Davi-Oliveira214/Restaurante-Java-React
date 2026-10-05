@@ -139,7 +139,7 @@ public class AgendamentoService {
         LocalDateTime inicio = data.atStartOfDay().plusHours(8);
         LocalDateTime fim = data.atStartOfDay().plusHours(22);
 
-        List<AgendamentoEntity> agenda = repository.findAgendamentoDia(inicio, fim, mesa);
+        List<AgendamentoEntity> agenda = this.repository.agendamentoDia(inicio, fim, mesa);
 
         List<HorarioDisponivel> horariosDisponiveis = new ArrayList<>();
 

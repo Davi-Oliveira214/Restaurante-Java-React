@@ -41,8 +41,8 @@ public interface AgendamentoRepository extends JpaRepository<AgendamentoEntity, 
             @Param("userId") Long id
     );
 
-    @Query(value = "SELECT m.id, m.numero_mesa, a.data_agendada, a.duracao, a.mesa_id, a.usuario_id FROM mesa AS m INNER JOIN agendamentos AS a ON m.id = a.mesa_id WHERE a.data_agendada BETWEEN :inicio AND :fim AND m.id = :mesa_id ORDER BY a.data_agendada", nativeQuery = true)
-    List<AgendamentoEntity> findAgendamentoDia(@Param("inicio") LocalDateTime inicioDia, @Param("fim") LocalDateTime fimDia, @Param("mesa_id") Long mesa);
+    @Query(value = "SELECT * FROM agendamentos WHERE data_agendada >= :inicio AND data_agendada < :fim AND mesa_id = :mesa_id ORDER BY data_agendada ASC", nativeQuery = true)
+    List<AgendamentoEntity> agendamentoDia(@Param("inicio") LocalDateTime inicioDia, @Param("fim") LocalDateTime fimDia, @Param("mesa_id") Long mesa);
 
     List<AgendamentoEntity> findByUsuarioId(Long userId);
 

@@ -60,7 +60,7 @@ public class AgendamentoController {
     }
 
     @GetMapping("/{mesa_id}/horarios")
-    public ResponseEntity<List<HorarioDisponivel>> agendamentoDoDia(@PathParam("mesa_id") Long mesa, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data, @RequestParam("duracao") int time) {
+    public ResponseEntity<List<HorarioDisponivel>> agendamentoDoDia(@PathVariable("mesa_id") Long mesa, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data, @RequestParam("duracao") int time) {
         return ResponseEntity.status(HttpStatus.OK).body(this.service.horariosDisponiveis(data, mesa, time));
     }
 }
