@@ -5,6 +5,7 @@ import {
    IconUserCheck,
    IconHome,
    IconLogout2,
+   IconCalendarClock,
 } from '@tabler/icons-react'
 import { AuthContext } from '../context/AuthContext'
 
@@ -16,7 +17,12 @@ const classeMenu =
 
 const itensMenu = [
    { Icone: IconHome, texto: 'home', rota: '/', tipo: 'comum' },
-
+   {
+      Icone: IconCalendarClock,
+      texto: 'agenda',
+      rota: '/agendamento',
+      tipo: 'login',
+   },
    { Icone: IconUserCheck, texto: 'login', rota: '/auth/login', tipo: 'auth' },
    {
       Icone: IconUserPlus,
@@ -68,7 +74,10 @@ export default function Header() {
          >
             {itensMenu
                .filter(
-                  ({ tipo }) => tipo === 'comum' || (!auth && tipo === 'auth'),
+                  ({ tipo }) =>
+                     tipo === 'comum' ||
+                     (!auth && tipo === 'auth') ||
+                     (auth && tipo === 'login'),
                )
                .map(({ Icone, rota, texto }) => (
                   <ItemMenu

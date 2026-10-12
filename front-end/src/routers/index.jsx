@@ -1,9 +1,9 @@
 import { createBrowserRouter } from 'react-router'
 import App from '../App'
-import { HomePage } from '../pages/HomePage'
+import { HomePage } from '../pages/home/HomePage'
 import Auth from '../pages/auth/index'
 import { Cadastro, Login } from '../pages/auth/components/FormsAuth'
-import RecuperarSenha from '../pages/auth/components/RecuperarSenha'
+import Agendamento from '../pages/scheduling'
 
 export const routers = createBrowserRouter([
    {
@@ -26,11 +26,11 @@ export const routers = createBrowserRouter([
                   path: 'cadastro',
                   element: <Cadastro />,
                },
-               {
-                  path: 'recuperar-senha',
-                  element: <RecuperarSenha />,
-               },
             ],
+         },
+         {
+            path: 'agendamento',
+            element: <Agendamento />,
          },
       ],
    },
