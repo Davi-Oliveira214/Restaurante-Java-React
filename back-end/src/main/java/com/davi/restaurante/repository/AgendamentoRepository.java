@@ -14,12 +14,13 @@ public interface AgendamentoRepository extends JpaRepository<AgendamentoEntity, 
 
     @Query(nativeQuery = true, value =
             "SELECT EXISTS(" +
-                    "  SELECT 1 FROM agendamentos a " +
-                    "  INNER JOIN mesa m ON a.mesa_id = m.id " +
-                    "  WHERE m.id = :mesaId " +
-                    "  AND (:id IS NULL OR a.id <> :id) " +
-                    "  AND a.data_agendada < :fim " +
-                    "  AND (a.data_agendada + (a.duracao || ' minutes')::interval) > :inicio" +
+                    "SELECT 1 FROM agendamentos a " +
+                    "INNER JOIN mesa m ON a.mesa_id = m.id " +
+                    "WHERE m.id = :mesaId " +
+                    "AND (:id IS NULL OR a.id <> :id) " +
+                    "AND a.status <> 'CANCELADO' " +
+                    "AND a.data_agendada < :fim " +
+                    "AND (a.data_agendada + (a.duracao || ' minutes')::interval) > :inicio" +
                     ")")
     boolean existeConflitoNoAgendamento(
             @Param("inicio") LocalDateTime inicio,
@@ -32,7 +33,8 @@ public interface AgendamentoRepository extends JpaRepository<AgendamentoEntity, 
             "FROM agendamentos a " +
             "INNER JOIN mesa m ON a.mesa_id = m.id " +
             "WHERE a.data_agendada BETWEEN :inicioDoDia AND :fimDoDia " +
-            "AND m.id = :mesaId AND a.usuario_id = :userId",
+            "AND m.id = :mesaId AND a.usuario_id = :userId" +
+            " AND a.status <> 'CANCELADO' ",
             nativeQuery = true)
     List<AgendamentoEntity> findAgendamentosDoDia(
             @Param("inicioDoDia") LocalDateTime inicioDoDia,

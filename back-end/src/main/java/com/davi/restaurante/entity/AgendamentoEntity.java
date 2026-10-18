@@ -1,18 +1,14 @@
 package com.davi.restaurante.entity;
 
+import com.davi.restaurante.entity.Enums.StatusAgendamento;
 import jakarta.persistence.*;
+import org.hibernate.annotations.DynamicInsert;
 
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "agendamentos", uniqueConstraints = {
-        @UniqueConstraint(
-                name = "unique_data_mesa",
-                columnNames = {"data_agendada", "mesa_id"}
-        )
-})
+@Table(name = "agendamentos")
+@DynamicInsert
 public class AgendamentoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +27,10 @@ public class AgendamentoEntity {
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private UsuarioEntity usuario;
+
+    @Column(name = "status", nullable = false, columnDefinition = "varchar DEFAULT 'AGUARDANDO'")
+    @Enumerated(EnumType.STRING)
+    private StatusAgendamento status;
 
     public AgendamentoEntity() {
     }
@@ -73,5 +73,13 @@ public class AgendamentoEntity {
 
     public void setUsuario(UsuarioEntity usuario) {
         this.usuario = usuario;
+    }
+
+    public StatusAgendamento getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusAgendamento status) {
+        this.status = status;
     }
 }

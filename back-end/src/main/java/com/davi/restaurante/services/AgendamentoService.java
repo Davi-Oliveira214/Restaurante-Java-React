@@ -1,19 +1,21 @@
 package com.davi.restaurante.services;
 
 import com.davi.restaurante.entity.AgendamentoEntity;
+import com.davi.restaurante.entity.Enums.StatusAgendamento;
 import com.davi.restaurante.entity.MesaEntity;
 import com.davi.restaurante.entity.UsuarioEntity;
 import com.davi.restaurante.exceptions.AgendamentoException;
 import com.davi.restaurante.exceptions.RestauranteException;
 import com.davi.restaurante.exceptions.UsuarioException;
 import com.davi.restaurante.records.request.AgendamentoRecord;
+import com.davi.restaurante.records.request.AgendamentoUpdate;
 import com.davi.restaurante.records.response.AgendamentoResponseRecord;
 import com.davi.restaurante.records.response.HorarioDisponivel;
 import com.davi.restaurante.repository.AgendamentoRepository;
 import com.davi.restaurante.repository.MesaRepository;
 import com.davi.restaurante.repository.UsuarioRepository;
-import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,38 +38,54 @@ public class AgendamentoService {
     }
 
     public AgendamentoResponseRecord agendar(AgendamentoRecord record) {
-        AgendamentoEntity agendamento = new AgendamentoEntity();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-        UsuarioEntity user = this.userRepository.findById(record.userId()).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
+        if (auth == null)
+            throw new UsuarioException("Usuário não autenticado", HttpStatus.UNAUTHORIZED);
+
+        UsuarioEntity user = this.userRepository.findByEmail(auth.getName()).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
 
         MesaEntity mesa = this.mesaRepository.findById(record.mesa()).orElseThrow(() -> new RestauranteException("Mesa informada não encontrada", HttpStatus.NOT_FOUND));
 
         if (this.repository.existeConflitoNoAgendamento(record.data(), calcHoras(record.data(), record.duracao()), mesa.getId(), null))
             throw new AgendamentoException("O tempo de agendamento gera conflito com os demais agendamentos", HttpStatus.CONFLICT);
 
-        BeanUtils.copyProperties(record, agendamento);
+        AgendamentoEntity agendamento = new AgendamentoEntity();
+        agendamento.setDuracao(record.duracao());
+        agendamento.setData(record.data());
         agendamento.setMesa(mesa);
         agendamento.setUsuario(user);
+        agendamento.setStatus(StatusAgendamento.AGUARDANDO);
 
-        this.repository.save(agendamento);
-        return new AgendamentoResponseRecord(agendamento);
+        return new AgendamentoResponseRecord(this.repository.save(agendamento));
     }
 
-    public AgendamentoResponseRecord cancelarAgendamento(Long userId, Long id) {
-        UsuarioEntity user = this.userRepository.findById(userId).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
+    public AgendamentoResponseRecord cancelarAgendamento(Long agendamentoId) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-        AgendamentoEntity agendamento = this.repository.findById(id).orElseThrow(() -> new AgendamentoException("Nenhum agendamento encontrado", HttpStatus.NOT_FOUND));
+        if (auth == null)
+            throw new UsuarioException("Usuário não autenticado", HttpStatus.UNAUTHORIZED);
+
+        UsuarioEntity user = this.userRepository.findByEmail(auth.getName()).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
+
+        AgendamentoEntity agendamento = this.repository.findById(agendamentoId).orElseThrow(() -> new AgendamentoException("Nenhum agendamento encontrado", HttpStatus.NOT_FOUND));
 
         if (!Objects.equals(user.getId(), agendamento.getUsuario().getId()))
             throw new AgendamentoException("Você não tem autorização para mudar essa agendamneto", HttpStatus.UNAUTHORIZED);
 
-        this.repository.delete(agendamento);
+        agendamento.setStatus(StatusAgendamento.CANCELADO);
+        this.repository.save(agendamento);
 
         return new AgendamentoResponseRecord(agendamento);
     }
 
-    public AgendamentoResponseRecord editarAgendamento(Long id, AgendamentoRecord record) {
-        UsuarioEntity user = this.userRepository.findById(record.userId()).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
+    public AgendamentoResponseRecord editarAgendamento(Long id, AgendamentoUpdate record) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null)
+            throw new UsuarioException("Usuário não autenticado", HttpStatus.UNAUTHORIZED);
+
+        UsuarioEntity user = this.userRepository.findByEmail(auth.getName()).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
 
         AgendamentoEntity agendamento = this.repository.findById(id)
                 .orElseThrow(() -> new AgendamentoException("Nenhum agendamento encontrado", HttpStatus.NOT_FOUND));
@@ -75,30 +93,34 @@ public class AgendamentoService {
         if (!Objects.equals(user.getId(), agendamento.getUsuario().getId()))
             throw new AgendamentoException("Você não tem autorização para mudar essa agendamneto", HttpStatus.UNAUTHORIZED);
 
-        MesaEntity mesa = this.mesaRepository.findById(record.mesa())
-                .orElseThrow(() -> new AgendamentoException("Mesa informada não encontrada", HttpStatus.NOT_FOUND));
+        if (agendamento.getStatus() == StatusAgendamento.CANCELADO)
+            throw new AgendamentoException("Essa agendamento está cancelado");
 
-        if (this.repository.existeConflitoNoAgendamento(record.data(), calcHoras(record.data(), record.duracao()), mesa.getId(), agendamento.getId()))
+        LocalDateTime data = record.data() != null ? record.data() : agendamento.getData();
+        int duracao = (record.duracao() != null && record.duracao() > 0) ? record.duracao() : agendamento.getDuracao();
+
+        MesaEntity mesa;
+        if (record.mesa() != null)
+            mesa = this.mesaRepository.findById(record.mesa()).orElseThrow(() -> new AgendamentoException("Mesa informada não encontrada", HttpStatus.NOT_FOUND));
+        else mesa = agendamento.getMesa();
+
+        if (this.repository.existeConflitoNoAgendamento(record.data(), calcHoras(data, duracao), mesa.getId(), agendamento.getId()))
             throw new AgendamentoException("O tempo de agendamento gera conflito com os demais agendamentos", HttpStatus.CONFLICT);
 
-        agendamento.setData(record.data());
-        agendamento.setDuracao(record.duracao());
+        agendamento.setData(data);
+        agendamento.setDuracao(duracao);
         agendamento.setMesa(mesa);
 
         return new AgendamentoResponseRecord(this.repository.save(agendamento));
     }
 
-    public List<AgendamentoResponseRecord> todosAgendamentos() {
-        List<AgendamentoEntity> agendamentos = this.repository.findAll();
+    public List<AgendamentoResponseRecord> usuarioTodosAgendamentos() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (agendamentos.isEmpty())
-            throw new AgendamentoException("Nenhum agendamento encontrado", HttpStatus.NOT_FOUND);
+        if (auth == null)
+            throw new UsuarioException("Usuário não autenticado", HttpStatus.UNAUTHORIZED);
 
-        return agendamentos.stream().map(AgendamentoResponseRecord::new).toList();
-    }
-
-    public List<AgendamentoResponseRecord> usuarioTodosAgendamentos(Long id) {
-        UsuarioEntity user = this.userRepository.findById(id).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
+        UsuarioEntity user = this.userRepository.findByEmail(auth.getName()).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
 
         List<AgendamentoEntity> agendamentos = this.repository.findByUsuarioId(user.getId());
 
@@ -108,26 +130,36 @@ public class AgendamentoService {
         return agendamentos.stream().map(AgendamentoResponseRecord::new).toList();
     }
 
-    public AgendamentoResponseRecord agendamentoId(Long user_id, Long agendamento_id) {
-        UsuarioEntity user = this.userRepository.findById(user_id).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
+    public AgendamentoResponseRecord agendamentoId(Long agendamento_id) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null)
+            throw new UsuarioException("Usuário não autenticado", HttpStatus.UNAUTHORIZED);
+
+        UsuarioEntity user = this.userRepository.findByEmail(auth.getName()).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
 
         AgendamentoEntity agendamento = this.repository.findById(agendamento_id).orElseThrow(() -> new AgendamentoException("Nenhum agendamento encontrado", HttpStatus.NOT_FOUND));
 
         if (!Objects.equals(user.getId(), agendamento.getUsuario().getId()))
-            throw new AgendamentoException("Você não tem autorização para mudar essa agendamneto", HttpStatus.UNAUTHORIZED);
+            throw new AgendamentoException("Você não tem autorização para acessar esse agendamneto", HttpStatus.UNAUTHORIZED);
 
         return new AgendamentoResponseRecord(agendamento);
     }
 
-    public List<AgendamentoResponseRecord> agendamentoDoDia(Long userId, LocalDate data, Long mesaId) {
-        this.userRepository.findById(userId).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
+    public List<AgendamentoResponseRecord> agendamentoDoDia(LocalDate data, Long mesaId) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null)
+            throw new UsuarioException("Usuário não autenticado", HttpStatus.UNAUTHORIZED);
+
+        var user = this.userRepository.findByEmail(auth.getName()).orElseThrow(() -> new UsuarioException("Usuário não encontrado", HttpStatus.NOT_FOUND));
 
         LocalDateTime inicio = data.atStartOfDay();
         LocalDateTime fim = data.atTime(LocalTime.MAX);
 
         MesaEntity mesa = this.mesaRepository.findById(mesaId).orElseThrow(() -> new RestauranteException("Mesa informada não encontrada", HttpStatus.NOT_FOUND));
 
-        List<AgendamentoEntity> agendamentos = this.repository.findAgendamentosDoDia(inicio, fim, mesa.getId(), userId);
+        List<AgendamentoEntity> agendamentos = this.repository.findAgendamentosDoDia(inicio, fim, mesa.getId(), user.getId());
 
         if (agendamentos.isEmpty())
             throw new AgendamentoException("Nenhum agendamento na data " + data + " para a mesa: " + mesaId, HttpStatus.NOT_FOUND);

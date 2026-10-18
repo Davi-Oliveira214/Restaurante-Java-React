@@ -30,9 +30,10 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> {
-                    request.requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll();
-                    request.requestMatchers("/api/usuario/**").authenticated();
-                    request.requestMatchers(HttpMethod.GET, "/api/mesa").permitAll().anyRequest().hasRole("ADM");
+                    request.requestMatchers("/api/auth/**").permitAll();
+                    request.requestMatchers("/api/usuario/**", "/api/agendamento/**").authenticated();
+                    request.requestMatchers("/api/adm/agendamento").hasRole("ADM");
+                    request.requestMatchers(HttpMethod.GET, "/api/mesa", "/api/pratos").permitAll().anyRequest().hasRole("ADM");
                 })
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
