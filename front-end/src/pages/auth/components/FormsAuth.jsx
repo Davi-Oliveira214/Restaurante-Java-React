@@ -26,7 +26,7 @@ export function Login() {
       const resp = await api
          .post('/auth/login', {
             email: formData.get('email'),
-            senha: formData.get('senha'),
+            password: formData.get('password'),
          })
          .then((data) => data.data)
          .catch((error) => error.response.data)
@@ -37,7 +37,7 @@ export function Login() {
             tipo: 'error',
          }))
       } else {
-         localStorage.setItem('@App:user', JSON.stringify(resp))
+         localStorage.setItem('@App:user_token', resp.token)
          setAuth(resp)
          navegate('/')
       }
@@ -49,7 +49,7 @@ export function Login() {
       <form className='w-full flex flex-col gap-4' onSubmit={submitLogin}>
          {mensagem.msg && <MensagemAviso prop={mensagem} />}
          <CampoInput id={'email'} label={'Email'} tipo={'email'} />
-         <CampoSenha id={'senha'} label={'Senha'} />
+         <CampoSenha id={'password'} label={'Senha'} />
 
          {/* <NavLink
             to='/auth/recuperar-senha'
@@ -77,7 +77,7 @@ export function Cadastro() {
 
       const formData = new FormData(e.currentTarget)
 
-      if (formData.get('senha') !== formData.get('repita_senha')) {
+      if (formData.get('password') !== formData.get('repeat_password')) {
          setMensagem(() => ({
             msg: 'As senhas não são iguais',
             tipo: 'error',
@@ -90,12 +90,12 @@ export function Cadastro() {
       const data = {
          nome: formData.get('nome'),
          email: formData.get('email'),
-         senha: formData.get('senha'),
-         repita_senha: formData.get('repita_senha'),
+         password: formData.get('password'),
+         repeat_password: formData.get('repeat_password'),
       }
 
       const resp = await api
-         .post('/auth/cadastro', data)
+         .post('/auth/register', data)
          .then((data) => data.data)
          .catch((error) => error.response.data)
 
@@ -119,8 +119,8 @@ export function Cadastro() {
          {mensagem.msg && <MensagemAviso prop={mensagem} />}
          <CampoInput id={'nome'} label={'Nome'} tipo={'text'} />
          <CampoInput id={'email'} label={'Email'} tipo={'email'} />
-         <CampoSenha id={'senha'} label={'Senha'} />
-         <CampoSenha id={'repita_senha'} label={'Repita a senha'} />
+         <CampoSenha id={'password'} label={'Senha'} />
+         <CampoSenha id={'repeat_password'} label={'Repita a senha'} />
 
          <div className='flex flex-col gap-3 mt-2'>
             <BotaoSubmit texto='Criar conta' disable={disabilitar} />

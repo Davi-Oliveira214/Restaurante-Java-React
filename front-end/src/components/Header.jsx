@@ -120,7 +120,7 @@ function Logout() {
    const { setAuth } = useContext(AuthContext)
 
    const sair = () => {
-      localStorage.removeItem('@App:user')
+      localStorage.removeItem('@App:user_token')
       setAuth(null)
    }
 

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { api } from '../../../../services/API'
 
 export default function CardAgendaFinal({
-   userId,
+   token,
    data,
    duracao,
    mesa,
@@ -34,12 +34,19 @@ export default function CardAgendaFinal({
       setMensagem('')
 
       try {
-         await api.post('/agendamento', {
-            userId,
-            data: horario,
-            duracao,
-            mesa: mesa[0],
-         })
+         await api.post(
+            '/agendamento',
+            {
+               data: horario,
+               duracao,
+               mesa: mesa[0],
+            },
+            {
+               headers: {
+                  Authorization: `Bearer ${token}`,
+               },
+            },
+         )
          setStatus('sucesso')
          setMensagem('Agendamento confirmado com sucesso!')
 

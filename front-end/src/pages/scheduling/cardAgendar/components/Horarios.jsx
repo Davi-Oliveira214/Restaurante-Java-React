@@ -1,15 +1,28 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../../../services/API'
 
-export default function Horarios({ id, data, duracao, onClick, horarioAtual }) {
+export default function Horarios({
+   id,
+   data,
+   duracao,
+   onClick,
+   horarioAtual,
+   token,
+}) {
    const [horarios, setHorarios] = useState([])
 
    useEffect(() => {
       if (!id || !data || !duracao) return
       const getMesas = async () => {
          const resp = await api.get(
-            `/agendamento/${id}/horarios?data=${data}&duracao=${duracao}`,
+            `/agendamento/horarios/${id}?data=${data}&duracao=${duracao}`,
+            {
+               headers: {
+                  Authorization: `Bearer ${token}`,
+               },
+            },
          )
+
          const dados = await resp.data
          setHorarios(dados)
       }

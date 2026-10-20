@@ -7,7 +7,7 @@ import Horarios from './components/Horarios'
 import StepBloco from './components/StepBloco'
 import CardAgendaFinal from './components/CardAgendaFinal'
 
-export default function CardAgendar({ userId, onFechar }) {
+export default function CardAgendar({ token, onFechar }) {
    const [dataEscolhida, setDataEscolhida] = useState('')
    const [duracao, setDuracao] = useState('')
    const [mesaEscolhida, setMesaEscolhida] = useState([])
@@ -121,6 +121,7 @@ export default function CardAgendar({ userId, onFechar }) {
                   sairEdicao()
                }}
                horarioAtual={horarioReservado}
+               token={token}
             />
          ),
       },
@@ -178,7 +179,7 @@ export default function CardAgendar({ userId, onFechar }) {
                )}
 
                <CardAgendaFinal
-                  userId={userId}
+                  token={token}
                   data={dataEscolhida}
                   duracao={duracao}
                   mesa={mesaEscolhida}

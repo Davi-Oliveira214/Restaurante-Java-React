@@ -6,8 +6,8 @@ export const AuthContext = createContext()
 // Proveider, é o que gerência todos os itens que vão utilizar o contexto
 export const AuthProveider = ({ children }) => {
    const [auth, setAuth] = useState(() => {
-      const user = localStorage.getItem('@App:user')
-      return user ? JSON.parse(user) : null
+      const user = localStorage.getItem('@App:user_token')
+      return user ? user : null
    })
 
    return (

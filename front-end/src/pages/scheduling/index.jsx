@@ -17,9 +17,9 @@ export default function Agendamento() {
       <>
          <main className='w-full h-screen flex flex-col'>
             <TextoAgenda onClick={abrirCard} />
-            <Agendamentos userId={auth.id} />
+            <Agendamentos token={auth} />
          </main>
-         {abrirAgendar && <CardAgendar userId={auth.id} onFechar={abrirCard} />}
+         {abrirAgendar && <CardAgendar token={auth} onFechar={abrirCard} />}
       </>
    )
 }
@@ -55,13 +55,13 @@ function TextoAgenda({ onClick }) {
    )
 }
 
-function Agendamentos({ userId }) {
+function Agendamentos({ token }) {
    const [agendamentos, setAgendamentos] = useState([])
    const [carregando, setCarregando] = useState(true)
    const [erro, setErro] = useState('')
 
    useEffect(() => {
-      if (!userId) {
+      if (!token) {
          setCarregando(false)
          return
       }
@@ -73,7 +73,11 @@ function Agendamentos({ userId }) {
             setCarregando(true)
             setErro('')
 
-            const resp = await api.get(`/agendamento/${userId}`)
+            const resp = await api.get(`/agendamento/meus_agendamentos`, {
+               headers: {
+                  Authorization: `Bearer ${token}`,
+               },
+            })
 
             if (ativo) {
                setAgendamentos(resp.data)
@@ -94,7 +98,7 @@ function Agendamentos({ userId }) {
       return () => {
          ativo = false
       }
-   }, [userId])
+   }, [token])
 
    return (
       <section className='flex-1 min-h-0 px-5 md:px-7  py-3'>
