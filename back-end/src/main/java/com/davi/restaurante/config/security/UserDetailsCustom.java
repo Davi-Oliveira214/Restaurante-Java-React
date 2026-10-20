@@ -1,4 +1,4 @@
-package com.davi.restaurante.security;
+package com.davi.restaurante.config.security;
 
 import com.davi.restaurante.exceptions.UsuarioException;
 import com.davi.restaurante.repository.UsuarioRepository;

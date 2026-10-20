@@ -6,7 +6,7 @@ import com.davi.restaurante.records.request.CreateRequest;
 import com.davi.restaurante.records.request.LoginRequest;
 import com.davi.restaurante.records.response.LoginResponse;
 import com.davi.restaurante.repository.UsuarioRepository;
-import com.davi.restaurante.security.TokenProvider;
+import com.davi.restaurante.config.security.TokenProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -38,7 +38,7 @@ public class AuthenticationService {
         if (this.repository.existsByEmail(record.email()))
             throw new UsuarioException("Esse usuário já está cadastrado", HttpStatus.UNAUTHORIZED);
 
-        verificarCaracterSenha(record.password(), record.repita_password());
+        verificarCaracterSenha(record.password(), record.repeat_password());
         String passwordEncode = new BCryptPasswordEncoder().encode(record.password());
         UsuarioEntity usuario = new UsuarioEntity(record, passwordEncode);
 

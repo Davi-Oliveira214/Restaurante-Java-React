@@ -124,9 +124,6 @@ public class AgendamentoService {
 
         List<AgendamentoEntity> agendamentos = this.repository.findByUsuarioId(user.getId());
 
-        if (agendamentos.isEmpty())
-            throw new AgendamentoException("Nenhum Agendamento encontrado", HttpStatus.NOT_FOUND);
-
         return agendamentos.stream().map(AgendamentoResponseRecord::new).toList();
     }
 

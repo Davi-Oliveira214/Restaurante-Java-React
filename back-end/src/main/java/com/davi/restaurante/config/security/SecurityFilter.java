@@ -1,8 +1,6 @@
-package com.davi.restaurante.security;
+package com.davi.restaurante.config.security;
 
 import com.davi.restaurante.exceptions.UsuarioException;
-import com.davi.restaurante.exceptions.security.FilterException;
-import com.davi.restaurante.exceptions.security.TokenException;
 import com.davi.restaurante.repository.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,4 +1,4 @@
-package com.davi.restaurante.security;
+package com.davi.restaurante.config.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
