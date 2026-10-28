@@ -5,10 +5,15 @@ import {
 } from '@tabler/icons-react'
 
 export default function CardSobreEvento({ agendamento }) {
-   const { agendamentoId, data, duracao, mesa } = agendamento
+   const { agendamentoId, data, duracao, mesa, status } = agendamento
 
    const dataInicio = new Date(data)
    const passado = dataInicio.getTime() < Date.now()
+   let statusColor = ''
+
+   if (status === 'confirmado') statusColor = 'bg-green-400/30'
+   else if (status === 'aguardando') statusColor = 'bg-laranja-500/20'
+   else statusColor = 'bg-red-800/30'
 
    return (
       <article
@@ -70,6 +75,12 @@ export default function CardSobreEvento({ agendamento }) {
                 font-semibold text-laranja-400'
                   >
                      {mesa?.codigo_mesa ?? 'Mesa não informada'}
+                  </span>
+
+                  <span
+                     className={`w-max rounded-md px-2 py-1 font-semibold text-white first-letter:uppercase ${statusColor}`}
+                  >
+                     {status}
                   </span>
                </div>
             </div>
