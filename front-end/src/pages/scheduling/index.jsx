@@ -145,6 +145,7 @@ function Agendamentos({ token }) {
                      <CardSobreEvento
                         key={agendamento.agendamentoId}
                         agendamento={agendamento}
+                        token={token}
                      />
                   ))}
             </div>
