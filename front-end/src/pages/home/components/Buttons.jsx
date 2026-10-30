@@ -18,11 +18,12 @@ export function Agendar() {
    )
 }
 
-export function Detalhes() {
+export function Detalhes({ onClick }) {
    return (
       <button
          type='button'
          className={`${base} bg-laranja-500 text-preto hover:bg-laranja-400 focus-visible:outline-laranja-500`}
+         onClick={onClick}
       >
          Detalhes
       </button>

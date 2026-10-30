@@ -4,37 +4,25 @@ import { useEffect, useState } from 'react'
 
 export default function Carrossel() {
    const [resp, setResp] = useState([])
+   const [pausado, setPausado] = useState(false)
 
    useEffect(() => {
-      const request = async () => {
-         const res = await api.get('/pratos')
-         const data = await res.data
-         setResp(data)
-      }
-      request()
+      api.get('/pratos').then((res) => setResp(res.data))
    }, [])
 
    return (
       <section className='flex flex-1 overflow-hidden'>
-         <ul className='flex gap-2 px-4 py-3 animate-carrossel'>
+         <ul
+            className={`flex gap-2 px-4 py-3 animate-carrossel ${pausado ? '[animation-play-state:paused]' : ''}`}
+         >
             {resp.map((prato) => (
                <li key={prato.id} className='shrink-0'>
-                  <Card
-                     nome={prato.nome}
-                     descricao={prato.descricao}
-                     preco={prato.preco}
-                     data={prato.data}
-                  />
+                  <Card {...prato} onAbrirCard={setPausado} />
                </li>
             ))}
             {resp.map((prato) => (
-               <li key={prato.id} className='shrink-0'>
-                  <Card
-                     nome={prato.nome}
-                     descricao={prato.descricao}
-                     preco={prato.preco}
-                     data={prato.data}
-                  />
+               <li key={`clone-${prato.id}`} className='shrink-0'>
+                  <Card {...prato} onAbrirCard={setPausado} />
                </li>
             ))}
          </ul>

@@ -22,6 +22,9 @@ public class TokenProvider {
     @Value("${spring.application.name}")
     private String name;
 
+    @Value("${app.expire.token}")
+    private Long expireToken;
+
     public String generationToken(String username) {
         try {
             return JWT.create()
@@ -35,7 +38,7 @@ public class TokenProvider {
     }
 
     private Instant expiration() {
-        return LocalDateTime.now().plusMinutes(120).toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().plusMinutes(expireToken).toInstant(ZoneOffset.of("-03:00"));
     }
 
     public String checkToken(String token) {
