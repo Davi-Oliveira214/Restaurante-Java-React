@@ -49,7 +49,7 @@ public class AgendamentoController {
         return ResponseEntity.status(HttpStatus.OK).body(this.service.agendamentoId(agendamento_id));
     }
 
-    @GetMapping("/data/{numero_mesa}")
+    @GetMapping("/data/{mesa_id}")
     public ResponseEntity<List<AgendamentoResponseRecord>> agendamentoDoDia(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data, @PathVariable("mesa_id") Long mesa) {
         return ResponseEntity.status(HttpStatus.OK).body(this.service.agendamentoDoDia(data, mesa));
     }
